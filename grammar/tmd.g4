@@ -13,7 +13,7 @@ description : machine
               ;
 
 machine: 'Machine' ID ';' ;
-naset : 'NAset' '=' '{' ID (COMMA ID)* '}' ';' ;
+naset : 'NAset' '=' '{' ID? (COMMA ID)* '}' ';' ;
 aset : 'Aset' '=' '{' ID (COMMA ID)* '}' ';' ;
 init : 'Init' '=' ID ';' ;
 inalphabet : 'INalphabet' '=' '{' SYMBOL (COMMA SYMBOL)* '}' ';' ;

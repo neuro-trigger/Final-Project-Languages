@@ -1,10 +1,10 @@
 Machine prueba ; ' Esto es un comentario
-NAset = {q0} ;
+NAset = {} ;
 Aset = {q0} ;
 Init = q0 ;
 INalphabet = {"0", "1"} ;
 Malphabet = {} ;
 
-Behaviour = {(q0, "a") : (q0, "b", LEFT),
-            (q0, "b") : (q0, "a", STAY)
+Behaviour = {(q0, "0") : (q0, "1", LEFT),
+            (q0, "1") : (q0, "0", STAY)
             } ;
