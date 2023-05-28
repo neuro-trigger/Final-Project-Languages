@@ -1,0 +1,11 @@
+{
+  "name": "turing-machine-simulator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "node main.js"
+  },
+  "author": "Equipo maravilla",
+  "license": "ISC"
+}
