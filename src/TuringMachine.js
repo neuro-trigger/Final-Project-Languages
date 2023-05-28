@@ -1,4 +1,4 @@
-class TuringMachine {
+export class TuringMachine {
     constructor(initState, behavior) {
         this.state = initState;
         this.position = -1;

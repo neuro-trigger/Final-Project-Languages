@@ -6,6 +6,10 @@
   "scripts": {
     "test": "node main.js"
   },
+  "type": "module",
   "author": "Equipo maravilla",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "antlr4": "^4.13.0"
+  }
 }
