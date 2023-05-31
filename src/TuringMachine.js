@@ -1,11 +1,15 @@
 export class TuringMachine {
-    constructor(initState, behavior) {
+    constructor(initState, behavior, symbols, aSet, nSet) {
         this.state = initState;
-        this.position = -1;
-        this.tape = [];
-        this.history = [];
+        this.position = -1; // Position on the tape.
+        this.tape = []; 
+        this.history = []; // Stack (or array simulating a stack).
+        this.symbols = symbols; // Stored as a set of symbols.
+        this.aSet = aSet; // Set of acceptation states.
+        this.nSet = nSet; // Set of not-acceptation states.
         this.behavior = behavior; // Stored as a map of maps state->symbol->instruction.
         this.nextInstruction = {nextState: "", writeSymbol : "", displacement: 0};
+        this.terminated = false;
     }
 
     nextStep() {
@@ -27,6 +31,11 @@ export class TuringMachine {
         }
         // Changes of state.
         this.state = this.nextInstruction.nextState;
+
+        if(this.aSet.has(this.state)) {
+            this.terminated = true;
+            return;
+        }
 
         // Updates the next instruction to execute.
         this.nextInstruction = this.behavior.get(this.state).get(this.tape[this.position]);

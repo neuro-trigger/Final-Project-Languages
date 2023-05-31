@@ -4,78 +4,130 @@ import antlr4 from 'antlr4';
 // This class defines a complete generic visitor for a parse tree produced by tmdParser.
 
 export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
+	constructor() {
+		super();
+
+		this.initState = null;
+		this.aSet = new Set();
+		this.nSet = new Set();
+		this.inAlphabet = new Set();
+		this.maAlphabet = new Set();
+		this.behavior = new Map();
+	}
 
 	// Visit a parse tree produced by tmdParser#description.
 	visitDescription(ctx) {
-	  return this.visitChildren(ctx);
+		this.visitChildren(ctx);
 	}
 
 
-	// Visit a parse tree produced by tmdParser#machine.
+	// Does nothing.
 	visitMachine(ctx) {
-	  return this.visitChildren(ctx);
 	}
 
 
-	// Visit a parse tree produced by tmdParser#naset.
+	// Stores the no-acceptance states.
 	visitNaset(ctx) {
-	  return this.visitChildren(ctx);
+		let i = 0;
+		while(ctx.ID(i) != null) {
+			this.nSet.add(ctx.ID(i).getText());
+		}
 	}
 
 
-	// Visit a parse tree produced by tmdParser#aset.
+	// Stores the acceptance states.
 	visitAset(ctx) {
-	  return this.visitChildren(ctx);
+		let i = 0;
+		while(ctx.ID(i) != null) {
+			this.aSet.add(ctx.ID(i).getText());
+		}
 	}
 
 
-	// Visit a parse tree produced by tmdParser#init.
+	// Stores the initial state.
 	visitInit(ctx) {
-	  return this.visitChildren(ctx);
+		let state = ctx.ID().getText();
+		/* The state was not previously included in the machine's definition. */
+		if(!this.aSet.has(state) && !this.nSet.has(state)) {
+			console.log("Wrong defined behavior (State does not exist): The state " + currState + " is not in the definition.");
+			return;
+		}
+		this.initState = state; 
 	}
 
 
-	// Visit a parse tree produced by tmdParser#inalphabet.
+	// Stores the input alphabet.
 	visitInalphabet(ctx) {
-	  return this.visitChildren(ctx);
+		let i = 0;
+		while(ctx.SYMBOL(i) != null) {
+			this.inAlphabet.add(ctx.SYMBOL(i).getText().charAt(1));
+		}
 	}
 
 
-	// Visit a parse tree produced by tmdParser#malphabet.
+	// Stores the machine alphabet.
 	visitMalphabet(ctx) {
-	  return this.visitChildren(ctx);
+		let i = 0;
+		while(ctx.SYMBOL(i) != null) {
+			this.maAlphabet.add(ctx.SYMBOL(i).getText().charAt(1));
+		}
 	}
 
 
-	// Visit a parse tree produced by tmdParser#behaviour.
+	// Processes each behavior rule (instruction).
 	visitBehaviour(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
 
-	// Visit a parse tree produced by tmdParser#behaviour_rule.
+	// Processes the behavior rule and stores it.
 	visitBehaviour_rule(ctx) {
-	  return this.visitChildren(ctx);
+		let currState = ctx.curr_state().ID().getText();
+		/* The state was not previously included in the machine's definition. */
+		if(!this.aSet.has(currState) && !this.nSet.has(currState)) {
+			console.log("Wrong defined behavior (State does not exist): The state " + currState + " is not in the definition.");
+			return;
+		}
+
+		/* The symbol was not previously included in the machine's definition. */
+		let currSymbol = ctx.curr_state().SYMBOL().getText().charAt(1);
+		if(!this.inAlphabet.has(currSymbol) && !this.maAlphabet.has(currSymbol)) {
+			console.log("Wrong defined behavior (Invalid symbol): The symbol " + currSymbol + "is not in the definition.");
+			return;
+		}
+
+		if(this.behavior.has(currState)) {
+			if(this.behavior.get(currState).has(currSymbol)) {
+				/* There are various possibilities for one pair (state, symbol) 
+					thus making the machine undeterministic, which is not allowed. */
+				console.log("Wrong defined behavior (Undeterministic model): There are more than 1 instructions mapped to (" 
+				+ currState + ", " + currSymbol + ").");
+
+				return;
+			}
+		}
+		else {
+			this.behavior.set(currState, new Map());
+		}
+
+		let ns = ctx.next_state().ID().getText();
+		let ws = ctx.next_state().SYMBOL().getText().charAt(1);
+		let mo = ctx.next_state().movement().getText();
+
+		switch(mo) {
+			case "LEFT":
+				mo = -1;
+				break;
+					
+			case "RIGHT":
+				mo = 1;
+				break;
+
+			default:
+				mo = 0;
+		}
+
+		let instruction = {nextState: ns, writeSymbol : ws, displacement: mo};
+		this.behavior.get(currState).set(currSymbol, instruction);
 	}
-
-
-	// Visit a parse tree produced by tmdParser#curr_state.
-	visitCurr_state(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
-	// Visit a parse tree produced by tmdParser#next_state.
-	visitNext_state(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
-	// Visit a parse tree produced by tmdParser#movement.
-	visitMovement(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
-
 }
