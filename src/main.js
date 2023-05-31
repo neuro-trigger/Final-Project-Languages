@@ -6,7 +6,7 @@ import TuringMachine from './TuringMachine.js';
 
 console.log("Hola Mundo");
 
-let inputCode = 'Machine prueba ; NAset = {q0} ; Aset = {q1, q2} ; Init = q0 ; INalphabet = {"0", "1"} ; Malphabet = {} ;Behaviour = {(q0, "0") : (q1, "0", LEFT), (q0, "1") : (q2, "0", STAY)} ;';
+let inputCode = 'Machine prueba ; NAset = {q0} ; Aset = {q1, q2} ; Init = q0 ; INalphabet = {"0", "1"} ; Malphabet = {} ;Behaviour = {(q0, "0") : (q0, "1", RIGHT), (q0, "1") : (q2, "0", STAY)} ;';
 let chars = new antlr4.InputStream(inputCode);
 let lexer = new tmdLexer(chars);
 let tokens = new antlr4.CommonTokenStream(lexer);
@@ -61,5 +61,38 @@ console.log(inalphabet);
 console.log(malphabet);
 console.log(behavior);
 /* END TEST */
+
+let turingMachine = new TuringMachine(codeAnalyzer.initState, codeAnalyzer.behavior, codeAnalyzer.inAlphabet, 
+                                            codeAnalyzer.mAlphabet, codeAnalyzer.aSet, codeAnalyzer.nSet);
+
+/* TEST FOR THE TURING MACHINE */
+/* This a basic test. For more complex inputs and machines 
+   (Where it is possible that the machine never stops) a max number
+   of iterations should be implemented to control that. */
+let inputTape = "0001000";
+if(turingMachine.verifyInput(inputTape)) {
+    turingMachine.loadInput(inputTape);
+    console.log("State: " + turingMachine.state + ", Position: " + turingMachine.position);
+    console.log(turingMachine.tape.toString() + "\n");
+
+    while(!turingMachine.terminated) {
+        turingMachine.nextStep();
+        console.log("State: " + turingMachine.state + ", Position: " + turingMachine.position);
+        console.log(turingMachine.tape.toString() + "\n");
+    }
+    console.log("TERMINATED");
+
+    /* Now we test the history */
+    while(turingMachine.history.length > 0) {
+        turingMachine.prevStep();
+        console.log("State: " + turingMachine.state + ", Position: " + turingMachine.position);
+        console.log(turingMachine.tape.toString() + "\n");
+    }
+    console.log("AT START");
+}
+else {
+    console.log("Invalid Input");
+}
+
 
 //console.log(parseTree.toStringTree(parser.ruleNames));
