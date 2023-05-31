@@ -1,5 +1,5 @@
-export class TuringMachine {
-    constructor(initState, behavior, symbols, aSet, nSet) {
+export default class TuringMachine {
+    constructor(initState, behavior, inAlphabet, mAlphabet, aSet, nSet) {
         this.state = initState;
         this.position = -1; // Position on the tape.
         this.tape = []; 

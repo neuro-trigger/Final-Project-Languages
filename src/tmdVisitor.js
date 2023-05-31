@@ -11,12 +11,14 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 		this.aSet = new Set();
 		this.nSet = new Set();
 		this.inAlphabet = new Set();
-		this.maAlphabet = new Set();
+		this.mAlphabet = new Set();
 		this.behavior = new Map();
+		this.error = false; // If there's an error then it cannot be accepted.
 	}
 
 	// Visit a parse tree produced by tmdParser#description.
 	visitDescription(ctx) {
+		console.log("DESCRIPTION");
 		this.visitChildren(ctx);
 	}
 
@@ -28,28 +30,34 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 
 	// Stores the no-acceptance states.
 	visitNaset(ctx) {
+		console.log("NASET");
 		let i = 0;
 		while(ctx.ID(i) != null) {
 			this.nSet.add(ctx.ID(i).getText());
+			++i;
 		}
 	}
 
 
 	// Stores the acceptance states.
 	visitAset(ctx) {
+		console.log("ASET");
 		let i = 0;
 		while(ctx.ID(i) != null) {
 			this.aSet.add(ctx.ID(i).getText());
+			++i;
 		}
 	}
 
 
 	// Stores the initial state.
 	visitInit(ctx) {
+		console.log("INIT");
 		let state = ctx.ID().getText();
 		/* The state was not previously included in the machine's definition. */
 		if(!this.aSet.has(state) && !this.nSet.has(state)) {
 			console.log("Wrong defined behavior (State does not exist): The state " + currState + " is not in the definition.");
+			this.error = true;
 			return;
 		}
 		this.initState = state; 
@@ -58,41 +66,49 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 
 	// Stores the input alphabet.
 	visitInalphabet(ctx) {
+		console.log("INALPHABET");
 		let i = 0;
 		while(ctx.SYMBOL(i) != null) {
 			this.inAlphabet.add(ctx.SYMBOL(i).getText().charAt(1));
+			++i;
 		}
 	}
 
 
 	// Stores the machine alphabet.
 	visitMalphabet(ctx) {
+		console.log("MALPHABET");
 		let i = 0;
 		while(ctx.SYMBOL(i) != null) {
-			this.maAlphabet.add(ctx.SYMBOL(i).getText().charAt(1));
+			this.mAlphabet.add(ctx.SYMBOL(i).getText().charAt(1));
+			++i;
 		}
 	}
 
 
 	// Processes each behavior rule (instruction).
 	visitBehaviour(ctx) {
+		console.log("BEHAVIOR");
 	  return this.visitChildren(ctx);
 	}
 
 
 	// Processes the behavior rule and stores it.
 	visitBehaviour_rule(ctx) {
+		console.log("BEHAVIOR_RULE");
 		let currState = ctx.curr_state().ID().getText();
 		/* The state was not previously included in the machine's definition. */
 		if(!this.aSet.has(currState) && !this.nSet.has(currState)) {
 			console.log("Wrong defined behavior (State does not exist): The state " + currState + " is not in the definition.");
+			this.error = true;
 			return;
 		}
 
 		/* The symbol was not previously included in the machine's definition. */
 		let currSymbol = ctx.curr_state().SYMBOL().getText().charAt(1);
-		if(!this.inAlphabet.has(currSymbol) && !this.maAlphabet.has(currSymbol)) {
+		if(!this.inAlphabet.has(currSymbol) && !this.mAlphabet.has(currSymbol)) {
 			console.log("Wrong defined behavior (Invalid symbol): The symbol " + currSymbol + "is not in the definition.");
+			this.error = true;
 			return;
 		}
 
@@ -102,6 +118,7 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 					thus making the machine undeterministic, which is not allowed. */
 				console.log("Wrong defined behavior (Undeterministic model): There are more than 1 instructions mapped to (" 
 				+ currState + ", " + currSymbol + ").");
+				this.error = true;
 
 				return;
 			}

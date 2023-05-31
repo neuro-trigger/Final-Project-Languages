@@ -16,5 +16,50 @@ let codeAnalyzer = new tmdVisitor();
 parser.buildParseTrees = true;
 
 let parseTree = parser.description();
+codeAnalyzer.visit(parseTree);
 
-console.log(parseTree.toStringTree(parser.ruleNames));
+/* TEST FOR THE VISITOR */
+let naset = "{";
+for(const x of codeAnalyzer.nSet) {
+    naset += x + ", ";
+}
+naset += "}";
+
+let aset = "{";
+for(const x of codeAnalyzer.aSet) {
+    aset += x + ", ";
+}
+aset += "}";
+
+let inis = codeAnalyzer.initState;
+
+let inalphabet = "{";
+for(const x of codeAnalyzer.inAlphabet) {
+    inalphabet += x + ", ";
+}
+inalphabet += "}";
+
+let malphabet = "{";
+for(const x of codeAnalyzer.mAlphabet) {
+    malphabet += x + ", ";
+}
+malphabet += "}";
+
+let behavior = "{";
+for(const [st, mapa] of codeAnalyzer.behavior.entries()) {
+    for(const [sy, ins] of codeAnalyzer.behavior.get(st).entries()) {
+        behavior += "(" + st + ", " + sy + ") : ";
+        behavior += "(" + ins.nextState + ", " + ins.writeSymbol + ", " + ins.displacement + ")\n";         
+    }
+}
+behavior += "}";
+
+console.log(naset);
+console.log(aset);
+console.log(inis);
+console.log(inalphabet);
+console.log(malphabet);
+console.log(behavior);
+/* END TEST */
+
+//console.log(parseTree.toStringTree(parser.ruleNames));
