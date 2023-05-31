@@ -46,8 +46,8 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 	visitAset(ctx) {
 		console.log("ASET");
 		/* There must be at least one acceptance state. */
-		if(ctx.ID(0) == null) {
-			console.log("Wrong defined behavior (No acceptance state): There's no acceptance state defined.");
+		if(ctx.ID(0).getText() == "<missing undefined>") {
+			console.log("Wrong defined Aset (No acceptance state): There's no acceptance state defined.");
 			this.error = true;
 			return;
 		}
@@ -56,13 +56,13 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 		while(ctx.ID(i) != null) {
 			/* The state was previously defined as an no-acceptance state. */
 			if(this.nSet.has(ctx.ID(i).getText())) {
-				console.log("Wrong defined behavior (Ambiguous state): The state " + ctx.ID(i).getText() + " is already defined as a no-acceptance state.");
+				console.log("Wrong defined Aset (Ambiguous state): The state " + ctx.ID(i).getText() + " is already defined as a no-acceptance state.");
 				this.error = true;
 			}
 			else {
 				this.aSet.add(ctx.ID(i).getText());
-				++i;
 			}
+			++i;
 		}
 	}
 
@@ -73,11 +73,12 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 		let state = ctx.ID().getText();
 		/* The state was not previously included in the machine's definition. */
 		if(!this.aSet.has(state) && !this.nSet.has(state)) {
-			console.log("Wrong defined behavior (State does not exist): The state " + currState + " is not in the definition.");
+			console.log("Wrong defined Init (Initial state does not exist): The state " + state + " is not in the definition.");
 			this.error = true;
-			return;
 		}
-		this.initState = state; 
+		else {
+			this.initState = state; 
+		}
 	}
 
 
@@ -168,7 +169,7 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 
 	checkValidSymbol(symbol) {
 		if(!this.inAlphabet.has(symbol) && !this.mAlphabet.has(symbol)) {
-			console.log("Wrong defined behavior (Invalid symbol): The symbol " + symbol + "is not in the definition.");
+			console.log("Wrong defined behavior (Invalid symbol): The symbol \"" + symbol + "\" is not in the definition.");
 			this.error = true;
 		}
 	}

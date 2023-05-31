@@ -6,7 +6,7 @@ import TuringMachine from './TuringMachine.js';
 
 console.log("Hola Mundo");
 
-let inputCode = 'Machine prueba ; NAset = {q0} ; Aset = {} ; Init = q0 ; INalphabet = {"0", "1"} ; Malphabet = {} ;Behaviour = {(q0, "0") : (q0, "1", LEFT), (q0, "1") : (q0, "0", STAY)} ;';
+let inputCode = 'Machine prueba ; NAset = {q0} ; Aset = {q1, q2} ; Init = q0 ; INalphabet = {"0", "1"} ; Malphabet = {} ;Behaviour = {(q0, "0") : (q1, "0", LEFT), (q0, "1") : (q2, "0", STAY)} ;';
 let chars = new antlr4.InputStream(inputCode);
 let lexer = new tmdLexer(chars);
 let tokens = new antlr4.CommonTokenStream(lexer);
