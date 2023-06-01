@@ -1,8 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import React from 'react';
-import logo from './logo.svg';
 
-const TuringMachine = () => {
+const TuringMachineRender = () => {
 
   return (
     <>
@@ -15,4 +14,4 @@ const TuringMachine = () => {
   );
 };
 
-export default TuringMachine;
+export default TuringMachineRender;

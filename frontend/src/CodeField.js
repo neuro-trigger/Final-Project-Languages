@@ -1,6 +1,6 @@
 import { Box, Button, Grid, TextField } from '@mui/material';
 import React, { useState } from 'react';
-import TuringMachine from './TuringMachine';
+import TuringMachineRender from './TuringMachineRender';
 
 const CodeField = ({ showingMachine, changeToMachine, changeToTextField}) => {
 
@@ -10,6 +10,8 @@ const CodeField = ({ showingMachine, changeToMachine, changeToTextField}) => {
     setTextFieldValue(event.target.value);
   };
 
+
+
   return (
     <>
       <Grid container>
@@ -17,7 +19,7 @@ const CodeField = ({ showingMachine, changeToMachine, changeToTextField}) => {
 
             { showingMachine ? 
             
-            <TuringMachine/>
+            <TuringMachineRender/>
             : 
             <Box margin={'10px'}>
                 <TextField
@@ -50,8 +52,11 @@ const CodeField = ({ showingMachine, changeToMachine, changeToTextField}) => {
                 <Button
               variant="contained"
               onClick={() => {
+                
                 console.log(textFieldValue);
                 changeToMachine();
+
+
               }}
             >
               Cargar Máquina de Turing
@@ -64,6 +69,23 @@ const CodeField = ({ showingMachine, changeToMachine, changeToTextField}) => {
               onClick={() => {
                 console.log(textFieldValue);
                 changeToTextField();
+
+                fetch('localhost:3000/api/longText', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ text: 'Texto largo de ejemplo' }),
+                })
+                  .then(response => response.json())
+                  .then(data => {
+                    console.log(data);
+                  })
+                  .catch(error => {
+                    console.error(error);
+                  });
+
+
               }}
             >
               Editar Máquina de Turing
