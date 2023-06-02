@@ -4,7 +4,8 @@ export default class TuringMachine {
         this.position = -1; // Position on the tape.
         this.tape = []; 
         this.history = []; // Stack (or array simulating a stack).
-        this.symbols = symbols; // Stored as a set of symbols.
+        this.inAlphabet = inAlphabet;
+        this.mAlphabet = mAlphabet;
         this.aSet = aSet; // Set of acceptation states.
         this.nSet = nSet; // Set of not-acceptation states.
         this.behavior = behavior; // Stored as a map of maps state->symbol->instruction.
@@ -32,6 +33,7 @@ export default class TuringMachine {
         // Changes of state.
         this.state = this.nextInstruction.nextState;
 
+        /* The machine always stops when it enters an acceptance state. */
         if(this.aSet.has(this.state)) {
             this.terminated = true;
             return;
@@ -42,12 +44,12 @@ export default class TuringMachine {
     }
 
     prevStep() {
-        let prevInstruction = history.pop();
+        let prevInstruction = this.history.pop();
 
         // Here makes the displacement at first and then writes.
-        this.position += this.prevInstruction.displacement;
-        this.state = this.prevInstruction.nextState;
-        this.tape[this.position] = this.prevInstruction.writeSymbol;
+        this.position += prevInstruction.displacement;
+        this.state = prevInstruction.nextState;
+        this.tape[this.position] = prevInstruction.writeSymbol;
     }
 
     loadMachine(newInitState, newBehavior) {
@@ -61,7 +63,18 @@ export default class TuringMachine {
         this.tape = inputString.split("");
         this.position = 0;
         this.history = [];
-        this.nextInstruction = behavior.get(this.state).get(this.tape[0]);    
+        this.nextInstruction = this.behavior.get(this.state).get(this.tape[0]);    
+    }
+
+    /* Returns false if the input has some invalid symbol. This should be
+       verified before loading the input. */
+    verifyInput(inputString) {
+        this.inArray = inputString.split("");
+        for(const char of this.inArray) {
+            if(!this.inAlphabet.has(char)) return false;
+        }
+
+        return true;
     }
 
 }

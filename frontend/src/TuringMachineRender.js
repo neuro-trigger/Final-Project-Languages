@@ -3,7 +3,7 @@ import React from 'react';
 import logo from './logo.svg';
 import './Machine.css';
 
-const TuringMachine = () => {
+const TuringMachineRender = () => {
 
   return (
     <>
@@ -17,4 +17,4 @@ const TuringMachine = () => {
   );
 };
 
-export default TuringMachine;
+export default TuringMachineRender;

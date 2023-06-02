@@ -1,8 +1,11 @@
 // jshint ignore: start
 import antlr4 from 'antlr4';
 
-// This class defines a complete generic visitor for a parse tree produced by tmdParser.
-
+/* This class processes the code input and stores all the important 
+	information about the Turing's machine and is required to load 
+	(construct) the machine. Each time a new machine wants to be 
+	loaded, it is necessary to instantiate a new tmdVisitor object
+	and execute the analysis from the first context description(). */
 export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 	constructor() {
 		super();
@@ -42,9 +45,23 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 	// Stores the acceptance states.
 	visitAset(ctx) {
 		console.log("ASET");
+		/* There must be at least one acceptance state. */
+		if(ctx.ID(0).getText() == "<missing undefined>") {
+			console.log("Wrong defined Aset (No acceptance state): There's no acceptance state defined.");
+			this.error = true;
+			return;
+		}
+
 		let i = 0;
 		while(ctx.ID(i) != null) {
-			this.aSet.add(ctx.ID(i).getText());
+			/* The state was previously defined as an no-acceptance state. */
+			if(this.nSet.has(ctx.ID(i).getText())) {
+				console.log("Wrong defined Aset (Ambiguous state): The state " + ctx.ID(i).getText() + " is already defined as a no-acceptance state.");
+				this.error = true;
+			}
+			else {
+				this.aSet.add(ctx.ID(i).getText());
+			}
 			++i;
 		}
 	}
@@ -56,11 +73,12 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 		let state = ctx.ID().getText();
 		/* The state was not previously included in the machine's definition. */
 		if(!this.aSet.has(state) && !this.nSet.has(state)) {
-			console.log("Wrong defined behavior (State does not exist): The state " + currState + " is not in the definition.");
+			console.log("Wrong defined Init (Initial state does not exist): The state " + state + " is not in the definition.");
 			this.error = true;
-			return;
 		}
-		this.initState = state; 
+		else {
+			this.initState = state; 
+		}
 	}
 
 
@@ -98,19 +116,11 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 		console.log("BEHAVIOR_RULE");
 		let currState = ctx.curr_state().ID().getText();
 		/* The state was not previously included in the machine's definition. */
-		if(!this.aSet.has(currState) && !this.nSet.has(currState)) {
-			console.log("Wrong defined behavior (State does not exist): The state " + currState + " is not in the definition.");
-			this.error = true;
-			return;
-		}
+		this.checkValidState(currState);
 
-		/* The symbol was not previously included in the machine's definition. */
 		let currSymbol = ctx.curr_state().SYMBOL().getText().charAt(1);
-		if(!this.inAlphabet.has(currSymbol) && !this.mAlphabet.has(currSymbol)) {
-			console.log("Wrong defined behavior (Invalid symbol): The symbol " + currSymbol + "is not in the definition.");
-			this.error = true;
-			return;
-		}
+		/* The symbol was not previously included in the machine's definition. */
+		this.checkValidSymbol(currSymbol);	
 
 		if(this.behavior.has(currState)) {
 			if(this.behavior.get(currState).has(currSymbol)) {
@@ -119,8 +129,6 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 				console.log("Wrong defined behavior (Undeterministic model): There are more than 1 instructions mapped to (" 
 				+ currState + ", " + currSymbol + ").");
 				this.error = true;
-
-				return;
 			}
 		}
 		else {
@@ -128,7 +136,9 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 		}
 
 		let ns = ctx.next_state().ID().getText();
+		this.checkValidState(ns);
 		let ws = ctx.next_state().SYMBOL().getText().charAt(1);
+		this.checkValidSymbol(ws);
 		let mo = ctx.next_state().movement().getText();
 
 		switch(mo) {
@@ -144,7 +154,23 @@ export default class tmdVisitor extends antlr4.tree.ParseTreeVisitor {
 				mo = 0;
 		}
 
-		let instruction = {nextState: ns, writeSymbol : ws, displacement: mo};
-		this.behavior.get(currState).set(currSymbol, instruction);
+		if(!this.error) {
+			let instruction = {nextState: ns, writeSymbol : ws, displacement: mo};
+			this.behavior.get(currState).set(currSymbol, instruction);
+		}
+	}
+
+	checkValidState(state) {
+		if(!this.aSet.has(state) && !this.nSet.has(state)) {
+			console.log("Wrong defined behavior (State does not exist): The state " + state + " is not in the definition.");
+			this.error = true;
+		}
+	}
+
+	checkValidSymbol(symbol) {
+		if(!this.inAlphabet.has(symbol) && !this.mAlphabet.has(symbol)) {
+			console.log("Wrong defined behavior (Invalid symbol): The symbol \"" + symbol + "\" is not in the definition.");
+			this.error = true;
+		}
 	}
 }
