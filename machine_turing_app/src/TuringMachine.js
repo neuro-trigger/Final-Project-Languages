@@ -1,15 +1,17 @@
 import { Box, Typography } from '@mui/material';
 import React from 'react';
 import logo from './logo.svg';
+import './Machine.css';
 
 const TuringMachine = () => {
 
   return (
     <>
       <Box>
-          <Typography variant="h1" component="h1">
-            ¡Aquí va la máquina de turing!
-          </Typography>
+          <div className='boxtape' >
+             <div className='tapecell'>            
+            </div>
+          </div>
       </Box>
     </>
   );
