@@ -1,16 +1,49 @@
 .tapecell{
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  background-color: #f9e7d0;
   display: flex;
-  align-items: center;
   justify-content: center;
-  background-color: lightblue;
+  align-items: center;
+  font-family: DengXian;
+  font-size: 1.4em;
+  border: 1px solid #F1D0A3;
+  margin-right: 2px;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
 .boxtape {
-  background-color: rgb(240, 209, 198);
-  width: 200px;
-  height: 65px;
-  border: 1px solid black;
+  width: 92.2%;
+  height: 5rem;
   overflow: hidden;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+
+}
+
+.tape{
+  display: flex;
+  height: 40px;
+  top: 6px;
+  left: -106px;
+  position: relative;
+
+}
+
+.head{
+  width: 60px;
+  height: 60px;
+  left: 156px;
+  border-style: ridge;
+  border-color: #C2926C;
+  position: absolute;
+  z-index: 2;
+}
+
+h4{
+  top: 45px;
+  left: 162px;
+  position: absolute;
+  color: #ac774b;
 }
